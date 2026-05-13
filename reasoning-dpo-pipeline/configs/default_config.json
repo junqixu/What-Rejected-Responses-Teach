@@ -1,0 +1,81 @@
+{
+  "base_model": "Qwen/Qwen2-0.5B",
+  "sft_checkpoint": "./checkpoints/qwen2_0.5b_sft/checkpoint-10339",
+  "tokenizer_path": "Qwen/Qwen2-0.5B",
+  "default_data": {
+    "train": "./data/half/train.json",
+    "validation": "./data/half/validation.json"
+  },
+  "hf_mirror": "https://hf-mirror.com",
+  "cache_dir": "/root/autodl-tmp/.cache",
+  "stage1": {
+    "error_types": ["computer_error", "dependency_mismatch", "missing_nodes", "disorder"],
+    "num_per_type": 500,
+    "seed": 42,
+    "qc": {
+      "min_chosen_len": 50,
+      "min_rejected_len": 30,
+      "max_rejected_chosen_ratio": 0.98,
+      "min_rejected_chosen_ratio": 0.40
+    }
+  },
+  "stage2": {
+    "model": "deepseek-chat",
+    "base_url": "https://api.deepseek.com",
+    "api_key_env": "DEEPSEEK_API_KEY",
+    "temperature": 0.3,
+    "max_tokens": 1800,
+    "max_retries": 3
+  },
+  "stage3": {
+    "full_dpo": {
+      "learning_rate": 2e-5,
+      "per_device_batch_size": 1,
+      "gradient_accumulation_steps": 8,
+      "num_train_epochs": 1,
+      "beta": 0.1,
+      "max_prompt_length": 512,
+      "max_length": 1024,
+      "warmup_ratio": 0.03,
+      "weight_decay": 0.1,
+      "max_grad_norm": 0.5,
+      "bf16": true,
+      "gradient_checkpointing": true,
+      "report_to": "swanlab",
+      "optim": "paged_adamw_32bit"
+    },
+    "lora_dpo": {
+      "lora_r": 16,
+      "lora_alpha": 32,
+      "lora_dropout": 0.05,
+      "learning_rate": 1e-5,
+      "per_device_batch_size": 1,
+      "gradient_accumulation_steps": 8,
+      "num_train_epochs": 1,
+      "beta": 0.1,
+      "optim": "paged_adamw_8bit"
+    }
+  },
+  "stage4": {
+    "k_list": [1, 2, 4, 8, 16, 32, 64, 128],
+    "max_tokens": 1024,
+    "temperature": 0.65,
+    "top_p": 0.95,
+    "test_size": 0.1,
+    "seed": 30,
+    "graph_threshold": 0.35,
+    "gpu_memory_utilization": 0.90
+  },
+  "rq3_experiments": {
+    "exp1": {
+      "description": "Two-type mix, 200 samples each type",
+      "total_types": 6,
+      "samples_per_type": 200
+    },
+    "exp2": {
+      "description": "Proportional injection, 1% and 10%",
+      "total_size": 400,
+      "ratios": [0.01, 0.10]
+    }
+  }
+}
