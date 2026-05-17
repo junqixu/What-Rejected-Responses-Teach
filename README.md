@@ -1,6 +1,10 @@
 # What-Rejected-Responses-Teach
 
-![Project Overview]([overall.pdf])
+<p align="center">
+  <img src="assets/overall.png" alt="What-Rejected-Responses-Teach overall pipeline" width="850">
+</p>
+
+
 A complete, research-ready codebase for training and evaluating large language models
 using Direct Preference Optimisation (DPO) on structured math reasoning tasks.
 
