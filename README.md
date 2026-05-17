@@ -1,7 +1,7 @@
 # What-Rejected-Responses-Teach
 
 <p align="center">
-  <img src="assets/overall.png" alt="What-Rejected-Responses-Teach overall pipeline" width="850">
+  <img src="assets/overall.jpg" alt="What-Rejected-Responses-Teach overall pipeline" width="850">
 </p>
 
 
