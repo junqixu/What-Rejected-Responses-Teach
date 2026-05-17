@@ -1,6 +1,6 @@
 # What-Rejected-Responses-Teach
 
-
+![Project Overview](overall.pdf])
 A complete, research-ready codebase for training and evaluating large language models
 using Direct Preference Optimisation (DPO) on structured math reasoning tasks.
 
