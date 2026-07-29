@@ -1,0 +1,6 @@
+metric,mean_a,mean_b,standardized_mean_difference,balanced_below_0_1
+op,10.0,10.0,0.0,True
+dag_depth,2.0,2.0,0.0,True
+rejected_tokens,153.34285714285716,144.68571428571428,0.19419546199830773,False
+token_edit_distance,7.6571428571428575,51.285714285714285,-1.7169793459774396,False
+error_node_depth,,,,False

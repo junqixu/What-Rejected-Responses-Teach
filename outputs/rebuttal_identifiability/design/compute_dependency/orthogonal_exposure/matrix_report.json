@@ -1,0 +1,127 @@
+{
+  "condition_number": null,
+  "condition_number_is_infinite": true,
+  "effective_rank": 2.0,
+  "feature_names": [
+    "computation.binary",
+    "operation_substitution.binary",
+    "dependency_redirect.binary",
+    "extra_edge.binary",
+    "missing_node.binary",
+    "spurious_node.binary",
+    "disorder.binary",
+    "wrong_target.binary"
+  ],
+  "matrix_rank": 2,
+  "n_features": 8,
+  "n_samples": 764,
+  "nullspace_dimension": 6,
+  "orientation": "exposure",
+  "pairwise_feature_correlation": [
+    [
+      1.0,
+      null,
+      -1.0,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      -1.0,
+      null,
+      1.0,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "singular_values": [
+    19.54482028569207,
+    19.54482028569207,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "source_files": [
+    "data\\rebuttal\\compute_dependency\\orthogonal_exposure.jsonl"
+  ],
+  "svd_tolerance": 3.315623930581766e-12,
+  "value_mode": "binary",
+  "variance_per_feature": [
+    0.25,
+    0.0,
+    0.25,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "duplicate_prompt_texts_skipped": 74,
+  "eligible_family_counts": {
+    "test": 93,
+    "train": 921,
+    "validation": 113
+  },
+  "eligible_prompt_counts": {
+    "test": 29082,
+    "train": 285270,
+    "validation": 35003
+  },
+  "op_filter": 10,
+  "output_hashes": {
+    "test_clean.jsonl": "0e3429c71739ccdeebfe9a22346974065bfaff99d87ad11dd6ec1cf50fec650e",
+    "train_clean.jsonl": "e14254286afdc91570107cea880ae11d5ebf4136b61b9e6b10df1d235716cac2",
+    "validation_clean.jsonl": "57a54987aea5f75947351baa5e2f07e0ffd70e91bf6d09e6331b84e152e30754"
+  },
+  "overlaps": {
+    "train_test_families": 0,
+    "train_test_prompts": 0,
+    "train_validation_families": 0,
+    "train_validation_prompts": 0,
+    "validation_test_families": 0,
+    "validation_test_prompts": 0
+  },
+  "ratios": {
+    "test": 0.09999999999999995,
+    "train": 0.8,
+    "validation": 0.1
+  },
+  "seed": 414,
+  "selected_family_counts": {
+    "test": 93,
+    "train": 600,
+    "validation": 91
+  },
+  "selected_prompt_counts": {
+    "test": 500,
+    "train": 1000,
+    "validation": 200
+  },
+  "source_files": [
+    "data\\half\\train.json",
+    "data\\half\\validation.json",
+    "data\\half\\test.json"
+  ],
+  "valid_no_leakage": true
+}

@@ -1,0 +1,10 @@
+{
+  "error_types": [
+    "computation",
+    "dependency_redirect",
+    "missing_node"
+  ],
+  "n_samples": 2080,
+  "note": "Token counts are deterministic surface proxies, not model-tokenizer lengths.",
+  "tokenizer": "unicode_word_punctuation_v1"
+}

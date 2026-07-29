@@ -1,0 +1,9 @@
+{
+  "train_file": "data/rebuttal_release/train.jsonl",
+  "output_dir": "outputs/rebuttal_taxonomy/checkpoints/mix/mean/seed_414",
+  "sequence_logp_reduction": "mean",
+  "learning_rate": 5e-6,
+  "beta": 0.1,
+  "epochs": 1.0,
+  "seed": 414
+}

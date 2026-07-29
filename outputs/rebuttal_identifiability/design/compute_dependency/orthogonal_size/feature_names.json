@@ -1,0 +1,10 @@
+[
+  "computation.binary",
+  "operation_substitution.binary",
+  "dependency_redirect.binary",
+  "extra_edge.binary",
+  "missing_node.binary",
+  "spurious_node.binary",
+  "disorder.binary",
+  "wrong_target.binary"
+]

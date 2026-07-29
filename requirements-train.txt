@@ -1,0 +1,9 @@
+-r requirements-core.txt
+transformers==4.46.3
+datasets==3.1.0
+trl==0.14.0
+accelerate==1.2.1
+bitsandbytes==0.45.0
+sentencepiece==0.2.0
+protobuf==5.29.2
+safetensors==0.4.5

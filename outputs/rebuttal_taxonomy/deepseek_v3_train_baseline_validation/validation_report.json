@@ -1,0 +1,18 @@
+{
+  "complete_prompt_count": 404,
+  "error_exposures": {
+    "computation": 404,
+    "dependency_redirect": 404,
+    "disorder": 404,
+    "extra_edge": 404,
+    "missing_node": 404,
+    "operation_substitution": 404,
+    "spurious_node": 404,
+    "wrong_target": 404
+  },
+  "n_failed": 0,
+  "n_prompts": 404,
+  "n_samples": 3232,
+  "prompt_split_leakage": {},
+  "valid": true
+}

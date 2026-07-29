@@ -1,0 +1,48 @@
+# Secrets and local configuration
+.env
+**/.env
+*.key
+*.pem
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Local model artifacts and caches
+checkpoints/
+**/checkpoints/
+*.safetensors
+*.bin
+*.pt
+*.pth
+.cache/
+
+# Large/raw datasets are not part of the server release
+data/*
+!data/rebuttal/
+!data/rebuttal/**
+!data/rebuttal_release/
+!data/rebuttal_release/**
+!data/rebuttal_v2/
+data/rebuttal_v2/*
+!data/rebuttal_v2/source/
+!data/rebuttal_v2/source/**
+
+# Keep reports, not local API logs or model outputs
+outputs/rebuttal_generation_logs/
+outputs/**/checkpoints/
+
+# Unrelated local workspaces
+agent-*/
+cleanup_confirmed_caches.ps1
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

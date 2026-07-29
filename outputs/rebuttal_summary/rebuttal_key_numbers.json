@@ -1,0 +1,29 @@
+{
+  "missing_disorder": {
+    "confounded_rank": 1,
+    "orthogonal_rank": 2,
+    "confounded_diag_missing": null,
+    "confounded_diag_disorder": null,
+    "orthogonal_diag_missing": null,
+    "orthogonal_diag_disorder": null,
+    "worst_axis_gain": null
+  },
+  "compute_dependency": {
+    "confounded_rank": 1,
+    "orthogonal_rank": 2,
+    "confounded_diag_computation": null,
+    "confounded_diag_dependency": null,
+    "orthogonal_diag_computation": null,
+    "orthogonal_diag_dependency": null,
+    "worst_axis_gain": null
+  },
+  "length_control": {
+    "missing_reasoning_standard": null,
+    "missing_reasoning_mean_logp": null
+  },
+  "taxonomy": {
+    "natural_parse_rate": null,
+    "natural_coverage": null,
+    "unknown_rate": null
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "condition_number": null,
+  "condition_number_is_infinite": true,
+  "effective_rank": 1.0,
+  "feature_names": [
+    "computation.binary",
+    "operation_substitution.binary",
+    "dependency_redirect.binary",
+    "extra_edge.binary",
+    "missing_node.binary",
+    "spurious_node.binary",
+    "disorder.binary",
+    "wrong_target.binary"
+  ],
+  "matrix_rank": 1,
+  "n_features": 8,
+  "n_samples": 414,
+  "nullspace_dimension": 7,
+  "orientation": "exposure",
+  "pairwise_feature_correlation": [
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "singular_values": [
+    28.774989139876297,
+    2.2304862941323124e-14,
+    3.5024205344076655e-16,
+    2.9976074661648476e-31,
+    3.8661702640650315e-32,
+    1.510895501929014e-48,
+    0.0,
+    0.0
+  ],
+  "source_files": [
+    "data\\rebuttal\\missing_disorder\\confounded.jsonl"
+  ],
+  "svd_tolerance": 2.6451830734483622e-12,
+  "value_mode": "binary",
+  "variance_per_feature": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "error_exposures": {
+    "computation": 1,
+    "dependency_redirect": 1,
+    "disorder": 1,
+    "extra_edge": 1,
+    "missing_node": 1,
+    "operation_substitution": 1,
+    "spurious_node": 1,
+    "wrong_target": 1
+  },
+  "n_failed": 0,
+  "n_samples": 8,
+  "prompt_split_leakage": {},
+  "valid": true
+}

@@ -1,0 +1,10 @@
+{
+  "train_file": "data/rebuttal_release/train.jsonl",
+  "error_types": "operation_substitution",
+  "output_dir": "outputs/rebuttal_taxonomy/checkpoints/operation_substitution/sum/seed_414",
+  "sequence_logp_reduction": "sum",
+  "learning_rate": 5e-6,
+  "beta": 0.1,
+  "epochs": 1.0,
+  "seed": 414
+}

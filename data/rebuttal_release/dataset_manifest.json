@@ -1,0 +1,117 @@
+{
+  "cross_split_overlaps": {
+    "train_test_families": 0,
+    "train_test_prompts": 0,
+    "train_validation_families": 0,
+    "train_validation_prompts": 0,
+    "validation_test_families": 0,
+    "validation_test_prompts": 0
+  },
+  "output_hashes": {
+    "test.jsonl": "cd8d4a95da998f360b3fd5a720d4b9ac7ced207c2828607802acd2e42c742c4d",
+    "train.jsonl": "473d41b9dafa97ea055de866b3f2658d73d94bd8f49b7070c9bd34b99179d207",
+    "validation.jsonl": "aa6b7360f53ed193fe35cc2f6c12629b42ee61b1e37d4c58722e527d840e9627"
+  },
+  "problems": [],
+  "release_version": "rebuttal-eight-axis-v1",
+  "splits": {
+    "test": {
+      "dag_families": 78,
+      "error_type_counts": {
+        "computation": 203,
+        "dependency_redirect": 203,
+        "disorder": 203,
+        "extra_edge": 203,
+        "missing_node": 203,
+        "operation_substitution": 203,
+        "spurious_node": 203,
+        "wrong_target": 203
+      },
+      "generator_models": {
+        "deepseek-chat": 406,
+        "deterministic": 1218
+      },
+      "generator_seeds": {
+        "2026": 145,
+        "414": 1279,
+        "6201": 200
+      },
+      "generator_versions": {
+        "deepseek-rebuttal-v3": 406,
+        "deterministic-graph-edit-v3": 1218
+      },
+      "input_file": "data\\rebuttal_v3\\deepseek\\test\\balanced\\all_types.jsonl",
+      "input_file_hash": "f5fe6a29d86f1aa054ae104d8f85ac2d7a73a095bb3449c0a8cb7aa995b44ad3",
+      "problems": [],
+      "prompts": 203,
+      "records": 1624,
+      "source_file": "data\\rebuttal_v2\\source\\test_clean.jsonl",
+      "source_file_hash": "0e3429c71739ccdeebfe9a22346974065bfaff99d87ad11dd6ec1cf50fec650e"
+    },
+    "train": {
+      "dag_families": 402,
+      "error_type_counts": {
+        "computation": 540,
+        "dependency_redirect": 540,
+        "disorder": 540,
+        "extra_edge": 540,
+        "missing_node": 540,
+        "operation_substitution": 540,
+        "spurious_node": 540,
+        "wrong_target": 540
+      },
+      "generator_models": {
+        "deepseek-chat": 3652,
+        "deterministic": 668
+      },
+      "generator_seeds": {
+        "414": 4320
+      },
+      "generator_versions": {
+        "deepseek-rebuttal-v2": 3612,
+        "deepseek-rebuttal-v3": 40,
+        "deterministic-graph-edit-v3": 668
+      },
+      "input_file": "data\\rebuttal_v3\\deepseek\\train\\balanced\\all_types.jsonl",
+      "input_file_hash": "bfbd4813198952253aa73355ec85fd7df9b94a5ea88c7b4e2e4f2df0483d5d7f",
+      "problems": [],
+      "prompts": 540,
+      "records": 4320,
+      "source_file": "data\\rebuttal_v2\\source\\train_clean.jsonl",
+      "source_file_hash": "e14254286afdc91570107cea880ae11d5ebf4136b61b9e6b10df1d235716cac2"
+    },
+    "validation": {
+      "dag_families": 62,
+      "error_type_counts": {
+        "computation": 85,
+        "dependency_redirect": 85,
+        "disorder": 85,
+        "extra_edge": 85,
+        "missing_node": 85,
+        "operation_substitution": 85,
+        "spurious_node": 85,
+        "wrong_target": 85
+      },
+      "generator_models": {
+        "deepseek-chat": 202,
+        "deterministic": 478
+      },
+      "generator_seeds": {
+        "414": 592,
+        "6201": 88
+      },
+      "generator_versions": {
+        "deepseek-rebuttal-v3": 202,
+        "deterministic-graph-edit-v3": 478
+      },
+      "input_file": "data\\rebuttal_v3\\deepseek\\validation\\balanced\\all_types.jsonl",
+      "input_file_hash": "7ff6dcf39c3736e7057b9443e59627f0893c107876019606724a2883d6007fa2",
+      "problems": [],
+      "prompts": 85,
+      "records": 680,
+      "source_file": "data\\rebuttal_v2\\source\\validation_clean.jsonl",
+      "source_file_hash": "57a54987aea5f75947351baa5e2f07e0ffd70e91bf6d09e6331b84e152e30754"
+    }
+  },
+  "valid": true
+}

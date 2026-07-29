@@ -1,0 +1,2 @@
+-r requirements-train.txt
+vllm==0.6.6.post1

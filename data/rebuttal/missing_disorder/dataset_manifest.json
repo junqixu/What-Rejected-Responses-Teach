@@ -1,0 +1,27 @@
+{
+  "error_a": "missing_node",
+  "error_b": "disorder",
+  "failed_prompts": 0,
+  "generator_version": "rebuttal-v1",
+  "output_hashes": {
+    "confounded.jsonl": "9fb9c238467e8f4e6a43f7561a73cf41a7c95f820a974d2f07f5a285b4759352",
+    "factorial.jsonl": "8f98651fccaa1a37892054f0d2c0f7d808588051996eb02f75d76ea7b4bd7716",
+    "orthogonal_exposure.jsonl": "27bbdc2757e0ddb3b0d58302ad630649efd037d5d8fe48cbb8efcb90eabc66dc",
+    "orthogonal_size.jsonl": "97e7a977da84b6c2d94f0b55b0c1f4c2e0db6f338c2e0a04782709d5cce04963",
+    "single_a.jsonl": "446b65c11e6c747153c7f6c9d308b0a5bcf246bb6ec9e0732924e72fb3f7e9c8",
+    "single_b.jsonl": "86f5d3dd34b8eb7d92ba8eaf088a3cffcc1c1faecf2c00518ff3933933d860b2"
+  },
+  "output_rows": {
+    "confounded": 414,
+    "factorial": 414,
+    "orthogonal_exposure": 828,
+    "orthogonal_size": 414,
+    "single_a": 414,
+    "single_b": 414
+  },
+  "seed": 414,
+  "source_files": [
+    "data\\yzh_data\\dpo_missing_nodes_414.json"
+  ],
+  "source_rows": 414
+}

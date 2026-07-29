@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rebuttal-structural-dpo"
+version = "0.1.0"
+description = "Structural error identifiability and expanded-taxonomy DPO experiments"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "numpy==1.26.4",
+]
+
+[tool.setuptools.packages.find]
+include = ["rebuttal*"]

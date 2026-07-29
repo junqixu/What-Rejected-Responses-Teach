@@ -1,0 +1,9 @@
+error_pair,regime,n_pairs,exposure_A,exposure_B,design_rank,effective_rank,condition_number,train_pair_accuracy,diag_A,diag_B,diag_AB,mean_axis,worst_axis,axis_imbalance,answer_128,reasoning_128,op_11_14_reasoning,op_15_20_reasoning,seed
+compute_dependency,confounded,382,382,382,1,1.0,,,,,,,,,,,,,414
+compute_dependency,factorial,382,232,227,2,1.970193267287578,,,,,,,,,,,,,414
+compute_dependency,orthogonal_exposure,764,382,382,2,2.0,,,,,,,,,,,,,414
+compute_dependency,orthogonal_size,382,196,186,2,1.999828621661781,,,,,,,,,,,,,414
+missing_disorder,confounded,414,414,414,1,1.0,,,,,,,,,,,,,414
+missing_disorder,factorial,414,248,248,2,1.9711329793931847,,,,,,,,,,,,,414
+missing_disorder,orthogonal_exposure,828,414,414,2,1.9999999999999998,,,,,,,,,,,,,414
+missing_disorder,orthogonal_size,414,207,207,2,1.9999999999999998,,,,,,,,,,,,,414

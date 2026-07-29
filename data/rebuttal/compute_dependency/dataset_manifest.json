@@ -1,0 +1,27 @@
+{
+  "error_a": "computation",
+  "error_b": "dependency_redirect",
+  "failed_prompts": 32,
+  "generator_version": "rebuttal-v1",
+  "output_hashes": {
+    "confounded.jsonl": "561d8835f276f931e89f3d513e582cabd9cc0869af68d9c7258061f78262d940",
+    "factorial.jsonl": "da1be977bc849c3f0378ba0a19c01042a1e42472f7fc7e3da9e62496573a5a63",
+    "orthogonal_exposure.jsonl": "eec94abb9fa61aaab9eeff3a40a342680c30e7f53ea1f29730f7b9c4c71b53e7",
+    "orthogonal_size.jsonl": "0b8f2a6220e56a40c2904f4524ce997039d4b7ea3fa7cfc50c7f7aa506dc1bc2",
+    "single_a.jsonl": "7c0d4d921acac0ea642931762db601f63d9dae5b6f7b5db9606b46894c6a0430",
+    "single_b.jsonl": "d32e571e625e3462ab09b9a50e9214055632c95555e442174402ea46917c8fa9"
+  },
+  "output_rows": {
+    "confounded": 382,
+    "factorial": 382,
+    "orthogonal_exposure": 764,
+    "orthogonal_size": 382,
+    "single_a": 382,
+    "single_b": 414
+  },
+  "seed": 414,
+  "source_files": [
+    "data\\yzh_data\\dpo_missing_nodes_414.json"
+  ],
+  "source_rows": 414
+}
