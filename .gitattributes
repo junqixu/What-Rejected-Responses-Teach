@@ -2,7 +2,7 @@
 *.sh text eol=lf
 *.py text eol=lf
 *.ps1 text eol=crlf
-*.jsonl -diff
+*.jsonl text eol=lf -diff
 *.npy binary
 *.npz binary
 *.png binary

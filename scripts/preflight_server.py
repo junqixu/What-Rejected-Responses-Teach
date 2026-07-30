@@ -19,10 +19,10 @@ from rebuttal.generation.package_release import SPLITS, validate_complete_split
 
 
 def _sha256(path: Path) -> str:
+    """Hash text datasets with canonical LF line endings across OS checkouts."""
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
+    content = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    digest.update(content)
     return digest.hexdigest()
 
 
