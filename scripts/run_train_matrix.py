@@ -22,6 +22,22 @@ P0 = [
 ]
 
 
+def _completed(output: Path, expected: dict[str, object]) -> bool:
+    manifest = output / "run_manifest.json"
+    if not manifest.exists():
+        return False
+    try:
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return payload.get("status") == "complete" and all(payload.get(key) == value for key, value in expected.items())
+
+
+def _write_matrix(path: Path, rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(rows, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def conditions(suite: str) -> list[tuple[str, str | None, str]]:
     if suite == "p0":
         return P0
@@ -41,14 +57,39 @@ def main() -> None:
     parser.add_argument("--seeds", default="414,6201,2026")
     parser.add_argument("--max_samples", type=int, default=None)
     parser.add_argument("--execute", action="store_true", help="Run GPU training; otherwise only run trainer dry-runs.")
+    parser.add_argument("--resume", action="store_true", help="Skip complete runs and restart incomplete outputs.")
     args = parser.parse_args()
     if not args.checkpoint:
         parser.error("--checkpoint is required, or set SFT_CHECKPOINT")
     seeds = [int(value) for value in args.seeds.split(",") if value.strip()]
     matrix: list[dict[str, object]] = []
+    manifest_path = Path(args.output_root) / "training_matrix.json"
     for name, error_type, reduction in conditions(args.suite):
         for seed in seeds:
             output = Path(args.output_root) / name / f"seed_{seed}"
+            entry: dict[str, object] = {
+                "name": name,
+                "error_type": error_type,
+                "reduction": reduction,
+                "seed": seed,
+                "output_dir": str(output),
+                "execute": args.execute,
+                "status": "pending",
+            }
+            matrix.append(entry)
+            expected = {
+                "checkpoint": args.checkpoint,
+                "base_model": args.base_model,
+                "seed": seed,
+                "sequence_logp_reduction": reduction,
+                "train_file": args.data,
+                "error_types": error_type,
+            }
+            if args.resume and args.execute and _completed(output, expected):
+                entry["status"] = "skipped_complete"
+                _write_matrix(manifest_path, matrix)
+                print(f"Skipping complete run: {output}")
+                continue
             command = [
                 sys.executable,
                 "-m",
@@ -72,20 +113,18 @@ def main() -> None:
                 command.extend(["--max_samples", str(args.max_samples)])
             if not args.execute:
                 command.append("--dry_run")
-            matrix.append(
-                {
-                    "name": name,
-                    "error_type": error_type,
-                    "reduction": reduction,
-                    "seed": seed,
-                    "output_dir": str(output),
-                    "execute": args.execute,
-                }
-            )
-            subprocess.run(command, check=True)
-    manifest_path = Path(args.output_root) / "training_matrix.json"
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(json.dumps(matrix, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            elif args.resume and output.exists():
+                command.extend(["--overwrite", "true"])
+            entry["status"] = "running" if args.execute else "dry_run"
+            _write_matrix(manifest_path, matrix)
+            try:
+                subprocess.run(command, check=True)
+            except BaseException:
+                entry["status"] = "failed"
+                _write_matrix(manifest_path, matrix)
+                raise
+            entry["status"] = "complete" if args.execute else "dry_run_complete"
+            _write_matrix(manifest_path, matrix)
 
 
 if __name__ == "__main__":

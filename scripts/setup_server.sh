@@ -7,7 +7,16 @@ cd "$REPO_ROOT"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 VENV_DIR="${VENV_DIR:-.venv}"
 TORCH_VERSION="${TORCH_VERSION:-2.5.1}"
-TORCH_INDEX_URL="${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu124}"
+TORCH_INDEX_URL="${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu121}"
+
+PYTHON_VERSION="$($PYTHON_BIN -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+case "$PYTHON_VERSION" in
+  3.10|3.11) ;;
+  *)
+    echo "Python $PYTHON_VERSION is unsupported. Use Python 3.10 or 3.11 via PYTHON_BIN." >&2
+    exit 2
+    ;;
+esac
 
 "$PYTHON_BIN" -m venv "$VENV_DIR"
 source "$VENV_DIR/bin/activate"

@@ -20,7 +20,17 @@ export SFT_CHECKPOINT=/path/to/qwen2_0.5b_sft_op10/checkpoint-10339
 python scripts/preflight_server.py --checkpoint "$SFT_CHECKPOINT"
 ```
 
-`setup_server.sh` 默认安装 PyTorch 2.5.1 CUDA 12.4 wheel；其他 CUDA 环境可覆盖：
+如果希望用最少命令完成环境检查、安装、GPU 冒烟、断点续跑训练和验证，使用
+[`SERVER_RUNBOOK_ZH.md`](SERVER_RUNBOOK_ZH.md) 与统一入口：
+
+```bash
+bash scripts/server_pipeline.sh bootstrap /path/to/sft_checkpoint
+bash scripts/server_pipeline.sh smoke
+bash scripts/server_pipeline.sh launch-full
+bash scripts/server_pipeline.sh status
+```
+
+`setup_server.sh` 默认安装兼容范围更广的 PyTorch 2.5.1 CUDA 12.1 wheel；其他 CUDA 环境可覆盖：
 
 ```bash
 TORCH_INDEX_URL=https://download.pytorch.org/whl/cu121 bash scripts/setup_server.sh

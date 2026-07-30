@@ -30,9 +30,12 @@ Updated: 2026-07-30.
   seed, checkpoint, and completion or failure status.
 - Sum-log-probability and token-mean DPO objectives share one implementation and
   can be compared with otherwise fixed settings.
-- All 26 offline unit tests pass. Data preflight, bytecode compilation, the P0
+- All 28 offline unit tests pass. Data preflight, bytecode compilation, the P0
   taxonomy matrix, the held-out evaluation matrix, and all identifiability
   conditions pass dry-run validation from the repository root.
+- The A800 server workflow now has a secret-free environment inspector, a single
+  pipeline entry point, background launch/status commands, provenance-aware
+  resume behavior, and a Chinese step-by-step runbook.
 
 ## Existing supporting experiments
 
