@@ -76,7 +76,8 @@ def main() -> None:
     parser.add_argument("--out", default=None)
     args = parser.parse_args()
 
-    disk = shutil.disk_usage(REPO_ROOT)
+    workspace_disk = shutil.disk_usage(REPO_ROOT)
+    system_disk = shutil.disk_usage(Path(REPO_ROOT.anchor))
     checkpoint = os.getenv("SFT_CHECKPOINT")
     report: dict[str, Any] = {
         "platform": platform.platform(),
@@ -86,8 +87,30 @@ def main() -> None:
         "memory": command(["free", "-h"]),
         "disk": {
             "path": str(REPO_ROOT),
-            "total_gib": round(disk.total / 2**30, 2),
-            "free_gib": round(disk.free / 2**30, 2),
+            "total_gib": round(workspace_disk.total / 2**30, 2),
+            "free_gib": round(workspace_disk.free / 2**30, 2),
+        },
+        "system_disk": {
+            "path": REPO_ROOT.anchor,
+            "total_gib": round(system_disk.total / 2**30, 2),
+            "free_gib": round(system_disk.free / 2**30, 2),
+        },
+        "storage_paths": {
+            name: os.getenv(name)
+            for name in (
+                "VIRTUAL_ENV",
+                "CACHE_ROOT",
+                "HF_HOME",
+                "PIP_CACHE_DIR",
+                "TORCH_HOME",
+                "TORCH_EXTENSIONS_DIR",
+                "TORCHINDUCTOR_CACHE_DIR",
+                "TRITON_CACHE_DIR",
+                "NUMBA_CACHE_DIR",
+                "CUDA_CACHE_PATH",
+                "XDG_CACHE_HOME",
+                "TMPDIR",
+            )
         },
         "gpu": gpu_report(),
         "nvcc": command(["nvcc", "--version"]),
@@ -106,6 +129,8 @@ def main() -> None:
         warnings.append("less than 20 GiB GPU memory; lower max length or use LoRA")
     if report["disk"]["free_gib"] < 60:
         warnings.append("less than 60 GiB free disk; the 0.5B final-only checkpoint matrix may fill the disk")
+    if report["system_disk"]["free_gib"] < 5:
+        warnings.append("less than 5 GiB free on the system disk; keep all experiment caches on the workspace disk")
     if not checkpoint:
         warnings.append("SFT_CHECKPOINT is not set")
     elif not Path(checkpoint).exists():

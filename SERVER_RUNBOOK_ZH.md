@@ -84,6 +84,8 @@ bash scripts/server_pipeline.sh bootstrap-sft
 outputs/rebuttal_sft/qwen2_0.5b_op10/
 ```
 
+不需要删除现有 base/Conda、PyTorch 或 CUDA。`.venv`、pip/Hugging Face/Torch/Triton/TorchInductor/Torch Extensions/Numba/CUDA 缓存、临时文件和所有模型输出都被定向到当前仓库所在的 `/root/autodl-tmp` 数据盘。流水线启动时还会把这些路径解析成绝对路径；任何环境或缓存路径落在项目目录外都会直接中止。30G 系统盘只保留服务器原有环境。`inspect` 和 `status` 会同时显示 `/` 与项目盘余量。
+
 预计首次依赖安装和模型下载约 10–30 分钟，SFT 约 5–20 分钟；网络速度是最大变量。重复运行时，若 `run_manifest.json` 已标记 `complete`，会直接复用而不会重训。
 
 目的：所有 DPO 条件从同一个、未接触 validation/test 和 rejected responses 的 SFT 起点开始，保证比较公平。
@@ -267,6 +269,8 @@ bash scripts/server_pipeline.sh test
 ### 磁盘不足
 
 0.5B 的 30 模型矩阵采用 final-only 保存时建议至少预留 60GB，100GB 可用但应持续监控。1.5B 或更大模型需要扩容或改为 LoRA。运行 `df -h` 和 `bash scripts/server_pipeline.sh status` 检查。
+
+不要为了腾空间删除 `/root/miniconda3`、系统 CUDA 或驱动。流水线的可删除产物都集中在项目目录；如果项目盘后续不足，先暂停训练并检查 `du -sh .venv .cache outputs/*`，确认目标后再清理，不要使用针对 `/root` 的递归删除命令。
 
 ### Codex 在远端无法登录
 

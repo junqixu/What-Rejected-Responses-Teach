@@ -5,7 +5,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 CONFIG_FILE="${SERVER_CONFIG_FILE:-.server.env}"
-VENV_DIR="${VENV_DIR:-.venv}"
+VENV_DIR="${VENV_DIR:-$REPO_ROOT/.venv}"
 
 load_config() {
   if [[ -f "$CONFIG_FILE" ]]; then
@@ -20,9 +20,43 @@ load_config() {
   EXPERIMENT_SUITE="${EXPERIMENT_SUITE:-full}"
   SEEDS="${SEEDS:-414,6201,2026}"
   RUN_ROOT="${RUN_ROOT:-outputs/rebuttal_taxonomy_full}"
-  HF_HOME="${HF_HOME:-$REPO_ROOT/.cache/huggingface}"
-  PIP_CACHE_DIR="${PIP_CACHE_DIR:-$REPO_ROOT/.cache/pip}"
-  export HF_HOME PIP_CACHE_DIR
+  CACHE_ROOT="${SERVER_CACHE_ROOT:-$REPO_ROOT/.cache}"
+  HF_HOME="$CACHE_ROOT/huggingface"
+  PIP_CACHE_DIR="$CACHE_ROOT/pip"
+  TORCH_HOME="$CACHE_ROOT/torch"
+  TRITON_CACHE_DIR="$CACHE_ROOT/triton"
+  CUDA_CACHE_PATH="$CACHE_ROOT/cuda"
+  XDG_CACHE_HOME="$CACHE_ROOT/xdg"
+  TMPDIR="$CACHE_ROOT/tmp"
+  HF_DATASETS_CACHE="$HF_HOME/datasets"
+  NUMBA_CACHE_DIR="$CACHE_ROOT/numba"
+  TORCH_EXTENSIONS_DIR="$CACHE_ROOT/torch_extensions"
+  TORCHINDUCTOR_CACHE_DIR="$CACHE_ROOT/torch_inductor"
+  WANDB_DIR="$CACHE_ROOT/wandb"
+  WANDB_CACHE_DIR="$CACHE_ROOT/wandb_cache"
+  mkdir -p "$HF_HOME" "$PIP_CACHE_DIR" "$TORCH_HOME" "$TRITON_CACHE_DIR" \
+    "$CUDA_CACHE_PATH" "$XDG_CACHE_HOME" "$TMPDIR" "$HF_DATASETS_CACHE" \
+    "$NUMBA_CACHE_DIR" "$TORCH_EXTENSIONS_DIR" "$TORCHINDUCTOR_CACHE_DIR" \
+    "$WANDB_DIR" "$WANDB_CACHE_DIR"
+  export CACHE_ROOT HF_HOME PIP_CACHE_DIR TORCH_HOME TRITON_CACHE_DIR CUDA_CACHE_PATH XDG_CACHE_HOME TMPDIR
+  export HF_DATASETS_CACHE NUMBA_CACHE_DIR TORCH_EXTENSIONS_DIR TORCHINDUCTOR_CACHE_DIR WANDB_DIR WANDB_CACHE_DIR
+}
+
+require_workspace_storage() {
+  local name path resolved
+  while (( $# )); do
+    name="$1"
+    path="$2"
+    shift 2
+    resolved="$(realpath -m "$path")"
+    case "$resolved" in
+      "$REPO_ROOT"|"$REPO_ROOT"/*) ;;
+      *)
+        echo "$name must stay under the data-disk workspace $REPO_ROOT; got $resolved" >&2
+        exit 2
+        ;;
+    esac
+  done
 }
 
 activate_environment() {
@@ -50,6 +84,7 @@ save_config() {
     printf 'BASE_MODEL_REVISION=%q\n' "$revision"
     printf 'SFT_TRAIN_FILE=%q\n' 'data/rebuttal_v2/source/train_clean.jsonl'
     printf 'SFT_OUTPUT=%q\n' "$checkpoint"
+    printf 'SERVER_CACHE_ROOT=%q\n' "$REPO_ROOT/.cache"
     printf 'EXPERIMENT_SUITE=full\n'
     printf 'SEEDS=414,6201,2026\n'
     printf 'RUN_ROOT=outputs/rebuttal_taxonomy_full\n'
@@ -77,6 +112,12 @@ EOF
 
 mode="${1:-help}"
 load_config
+require_workspace_storage \
+  VENV_DIR "$VENV_DIR" \
+  CONFIG_FILE "$CONFIG_FILE" \
+  CACHE_ROOT "$CACHE_ROOT" \
+  TMPDIR "$TMPDIR" \
+  RUN_ROOT "$RUN_ROOT"
 
 case "$mode" in
   inspect)
@@ -103,6 +144,7 @@ case "$mode" in
   bootstrap-sft)
     model="${2:-$BASE_MODEL}"
     checkpoint="${3:-$SFT_OUTPUT}"
+    require_workspace_storage SFT_CHECKPOINT "$checkpoint"
     revision="${BASE_MODEL_REVISION:-main}"
     save_config "$checkpoint" "$model" "$revision"
     load_config
@@ -190,6 +232,7 @@ case "$mode" in
     ;;
   status)
     activate_environment
+    df -h / "$REPO_ROOT"
     nvidia-smi
     python scripts/summarize_server_runs.py --root outputs
     if [[ -f outputs/server_logs/latest_full_log.txt ]]; then
