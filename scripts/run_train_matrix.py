@@ -56,6 +56,7 @@ def main() -> None:
     parser.add_argument("--suite", choices=("p0", "full"), default="p0")
     parser.add_argument("--seeds", default="414,6201,2026")
     parser.add_argument("--max_samples", type=int, default=None)
+    parser.add_argument("--save_strategy", choices=("no", "steps"), default="no")
     parser.add_argument("--execute", action="store_true", help="Run GPU training; otherwise only run trainer dry-runs.")
     parser.add_argument("--resume", action="store_true", help="Skip complete runs and restart incomplete outputs.")
     args = parser.parse_args()
@@ -84,6 +85,7 @@ def main() -> None:
                 "sequence_logp_reduction": reduction,
                 "train_file": args.data,
                 "error_types": error_type,
+                "save_strategy": args.save_strategy,
             }
             if args.resume and args.execute and _completed(output, expected):
                 entry["status"] = "skipped_complete"
@@ -104,6 +106,8 @@ def main() -> None:
                 args.base_model,
                 "--sequence_logp_reduction",
                 reduction,
+                "--save_strategy",
+                args.save_strategy,
                 "--seed",
                 str(seed),
             ]

@@ -48,6 +48,7 @@ class TrainingPreflightTests(unittest.TestCase):
             ]
         )
         self.assertEqual(args.error_types, "operation_substitution,wrong_target")
+        self.assertEqual(args.save_strategy, "no")
 
 
 if __name__ == "__main__":

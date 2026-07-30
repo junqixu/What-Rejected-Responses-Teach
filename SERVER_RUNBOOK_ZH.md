@@ -90,7 +90,7 @@ bash scripts/server_pipeline.sh bootstrap /root/autodl-tmp/models/qwen2_0.5b_sft
 这一个命令会：
 
 1. 将 checkpoint 路径保存到本地 `.server.env`；该文件被 Git 忽略。
-2. 检查 Python 必须是 3.10 或 3.11。
+2. 检查 Python 必须是 3.10、3.11 或 3.12。
 3. 创建 `.venv`。
 4. 安装 PyTorch 2.5.1 CUDA 12.1 和固定版本依赖。
 5. 校验正式数据、CUDA、BF16 和 checkpoint。
@@ -104,7 +104,7 @@ bash scripts/server_pipeline.sh bootstrap /root/autodl-tmp/models/qwen2_0.5b_sft
 
 并且单元测试最后显示 `OK`。
 
-如果服务器默认 `python3` 不是 3.10/3.11，例如系统有 `python3.10`：
+如果服务器默认 `python3` 不在 3.10--3.12 范围内，例如系统有 `python3.10`：
 
 ```bash
 PYTHON_BIN=python3.10 bash scripts/server_pipeline.sh bootstrap /你的/checkpoint/路径
@@ -150,7 +150,7 @@ bash scripts/server_pipeline.sh launch-full
 2. 对每个完成模型运行 validation 八类型诊断。
 3. 自动生成跨 seed 汇总表。
 
-断开 SSH 不会终止 `nohup` 后台任务。A800 80GB 预计需要约 8–18 小时，实际时间取决于平均序列长度、磁盘速度和 GPU 当前负载。
+断开 SSH 不会终止 `nohup` 后台任务。A800 80GB 预计需要约 8–18 小时，实际时间取决于平均序列长度、磁盘速度和 GPU 当前负载。默认只保存每个模型的最终权重，不保存 step-200/400 中间副本；矩阵级断点续跑仍然有效。
 
 ## 第 8 步：查看进度
 
@@ -234,9 +234,9 @@ bash scripts/server_pipeline.sh test
 
 ## 常见问题
 
-### `Python 3.10 or 3.11 is required`
+### `Python 3.10, 3.11, or 3.12 is required`
 
-使用服务器已有的 `python3.10` 或创建 Conda Python 3.10 环境，再通过 `PYTHON_BIN` 指定。
+使用服务器已有的 Python 3.10--3.12，或创建对应 Conda 环境后通过 `PYTHON_BIN` 指定。
 
 ### `SFT checkpoint does not exist`
 
@@ -252,7 +252,7 @@ bash scripts/server_pipeline.sh test
 
 ### 磁盘不足
 
-完整 30 模型矩阵建议至少预留 100GB，最好 150GB。运行 `df -h` 和 `bash scripts/server_pipeline.sh status` 检查。
+0.5B 的 30 模型矩阵采用 final-only 保存时建议至少预留 60GB，100GB 可用但应持续监控。1.5B 或更大模型需要扩容或改为 LoRA。运行 `df -h` 和 `bash scripts/server_pipeline.sh status` 检查。
 
 ### Codex 在远端无法登录
 

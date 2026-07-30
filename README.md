@@ -7,7 +7,7 @@
 
 ## 服务器快速开始
 
-要求：Linux、Python 3.10/3.11、NVIDIA CUDA GPU，以及论文使用的 OP=10 Qwen2-0.5B SFT checkpoint。
+要求：Linux、Python 3.10--3.12、NVIDIA CUDA GPU，以及论文使用的 OP=10 Qwen2-0.5B SFT checkpoint。
 
 ```bash
 git clone --branch codex/rebuttal-release --single-branch \

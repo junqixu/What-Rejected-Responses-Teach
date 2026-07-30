@@ -97,15 +97,15 @@ def main() -> None:
     }
     blockers: list[str] = []
     warnings: list[str] = []
-    if sys.version_info[:2] not in {(3, 10), (3, 11)}:
-        blockers.append("Python 3.10 or 3.11 is required")
+    if sys.version_info[:2] not in {(3, 10), (3, 11), (3, 12)}:
+        blockers.append("Python 3.10, 3.11, or 3.12 is required")
     devices = report["gpu"]["devices"]
     if not devices:
         blockers.append("nvidia-smi did not report a GPU")
     elif min(device["memory_total_mib"] for device in devices) < 20_000:
         warnings.append("less than 20 GiB GPU memory; lower max length or use LoRA")
-    if report["disk"]["free_gib"] < 100:
-        warnings.append("less than 100 GiB free disk; the full checkpoint matrix may fill the disk")
+    if report["disk"]["free_gib"] < 60:
+        warnings.append("less than 60 GiB free disk; the 0.5B final-only checkpoint matrix may fill the disk")
     if not checkpoint:
         warnings.append("SFT_CHECKPOINT is not set")
     elif not Path(checkpoint).exists():

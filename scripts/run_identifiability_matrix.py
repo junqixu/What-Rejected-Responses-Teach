@@ -64,6 +64,7 @@ def main() -> None:
                 "seed": seed,
                 "train_file": config_payload.get("train_file"),
                 "sequence_logp_reduction": config_payload.get("sequence_logp_reduction", "sum"),
+                "save_strategy": config_payload.get("save_strategy", "no"),
             }
             if args.resume and args.execute and _completed(output, expected):
                 entry["status"] = "skipped_complete"

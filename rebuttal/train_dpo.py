@@ -50,6 +50,7 @@ def _config(args: argparse.Namespace, n_samples: int) -> dict[str, Any]:
         "max_length": args.max_length,
         "optimizer": args.optimizer,
         "logging_steps": args.logging_steps,
+        "save_strategy": args.save_strategy,
         "save_steps": args.save_steps,
     }
 
@@ -174,8 +175,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         learning_rate=args.learning_rate,
         num_train_epochs=args.epochs,
         logging_steps=args.logging_steps,
+        save_strategy=args.save_strategy,
         save_steps=args.save_steps,
-        save_total_limit=2,
+        save_total_limit=1,
         bf16=True,
         gradient_checkpointing=True,
         gradient_checkpointing_kwargs={"use_reentrant": False},
@@ -248,6 +250,12 @@ def build_parser(defaults: dict[str, Any] | None = None) -> argparse.ArgumentPar
     parser.add_argument("--max_prompt_length", type=int, default=512)
     parser.add_argument("--max_length", type=int, default=1024)
     parser.add_argument("--logging_steps", type=int, default=10)
+    parser.add_argument(
+        "--save_strategy",
+        choices=("no", "steps"),
+        default="no",
+        help="Default final-only saving avoids dozens of intermediate model copies.",
+    )
     parser.add_argument("--save_steps", type=int, default=200)
     parser.add_argument("--optimizer", default="paged_adamw_8bit")
     add_common_cli_args(parser)
