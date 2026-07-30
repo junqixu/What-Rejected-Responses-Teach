@@ -7,26 +7,22 @@
 
 ## 服务器快速开始
 
-要求：Linux、Python 3.10--3.12、NVIDIA CUDA GPU，以及论文使用的 OP=10 Qwen2-0.5B SFT checkpoint。
+要求：Linux、Python 3.10--3.12 和 NVIDIA CUDA GPU。没有基础模型或 SFT checkpoint 也可以，统一流水线会下载公开的 Qwen2-0.5B 并只用干净 train/OP=10 数据生成 SFT 起点。
 
 ```bash
 git clone --branch codex/rebuttal-release --single-branch \
   https://github.com/junqixu/What-Rejected-Responses-Teach.git
 cd What-Rejected-Responses-Teach
-bash scripts/setup_server.sh
-source .venv/bin/activate
-
-export SFT_CHECKPOINT=/path/to/qwen2_0.5b_sft_op10/checkpoint-10339
-python scripts/preflight_server.py --checkpoint "$SFT_CHECKPOINT"
+bash scripts/server_pipeline.sh inspect
+bash scripts/server_pipeline.sh start
+bash scripts/server_pipeline.sh status
 ```
 
 如果希望用最少命令完成环境检查、安装、GPU 冒烟、断点续跑训练和验证，使用
 [`SERVER_RUNBOOK_ZH.md`](SERVER_RUNBOOK_ZH.md) 与统一入口：
 
 ```bash
-bash scripts/server_pipeline.sh bootstrap /path/to/sft_checkpoint
-bash scripts/server_pipeline.sh smoke
-bash scripts/server_pipeline.sh launch-full
+bash scripts/server_pipeline.sh start
 bash scripts/server_pipeline.sh status
 ```
 

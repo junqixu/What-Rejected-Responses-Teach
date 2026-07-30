@@ -1,10 +1,10 @@
 # A800 单卡服务器运行手册
 
-本手册面向单卡 NVIDIA A800 80GB。目标是用尽量少的命令完成环境检查、依赖安装、真实 GPU 冒烟、完整八类型 DPO 训练、验证集诊断和最终测试。服务器不需要 DeepSeek API，也不需要 `.env`；发布数据已经包含所有 rejected responses。
+本手册面向单卡 NVIDIA A800 80GB。目标是用尽量少的命令完成环境检查、公开基础模型下载、干净 OP=10 SFT、真实 GPU 冒烟、完整八类型 DPO、验证集诊断和最终测试。服务器不需要 DeepSeek API，也不需要 `.env`；发布数据已经包含所有 rejected responses。
 
 ## 最终会得到什么
 
-主实验默认训练 10 个条件、3 个随机种子，共 30 个模型：
+流水线首先从 `Qwen/Qwen2-0.5B` 训练一个公共 SFT 起点，输出到 `outputs/rebuttal_sft/qwen2_0.5b_op10/`。SFT 只读取 `train_clean.jsonl` 的 1000 条 `split=train、op=10` 正确解答，并在启动前确认与 validation/test 的 prompt 和 DAG family 均无重叠。随后主实验默认训练 10 个条件、3 个随机种子，共 30 个模型：
 
 - 八类型混合标准 DPO：`mix_sum`。
 - 八类型混合 token-mean 长度控制：`mix_mean`。
@@ -30,7 +30,7 @@ SSH: connect.bjb1.seetacloud.com
 首次下载：
 
 ```bash
-cd /root
+cd /root/autodl-tmp
 git clone --branch codex/rebuttal-release --single-branch https://github.com/junqixu/What-Rejected-Responses-Teach.git
 cd What-Rejected-Responses-Teach
 ```
@@ -38,9 +38,9 @@ cd What-Rejected-Responses-Teach
 如果目录已经存在：
 
 ```bash
-cd /root/What-Rejected-Responses-Teach
+cd /root/autodl-tmp/What-Rejected-Responses-Teach
 git checkout codex/rebuttal-release
-git pull origin codex/rebuttal-release
+git -c http.version=HTTP/1.1 pull origin codex/rebuttal-release
 ```
 
 目的：服务器只下载已审计的发布分支。DeepSeek key、原始 API 日志和本地 checkpoint 都没有上传。
@@ -61,40 +61,48 @@ outputs/server_preflight/environment.json
 
 第一次执行时 `torch.installed: false` 和 `SFT_CHECKPOINT is not set` 属于正常现象。请把这个 JSON 内容发给 Codex，以便根据实际驱动和磁盘进一步调整。
 
-## 第 4 步：准备 SFT checkpoint
+## 第 4 步：自动生成 SFT checkpoint
 
-Git 仓库不包含模型。你必须准备与规模匹配的 OP=10 SFT checkpoint，例如：
-
-```text
-/root/autodl-tmp/models/qwen2_0.5b_sft_op10/checkpoint-10339
-```
-
-检查目录：
+你当前没有基础模型文件或 checkpoint，直接运行：
 
 ```bash
-ls -lh /root/autodl-tmp/models/qwen2_0.5b_sft_op10/checkpoint-10339
-```
-
-目录中至少应有 `config.json`、模型权重和 tokenizer 文件。0.5B checkpoint 只能配合 Qwen2-0.5B；不能给 1.5B 或 7B 使用。
-
-目的：所有 DPO 条件必须从相同的 SFT 起点开始，才能公平比较。
-
-## 第 5 步：一键安装和预检
-
-把下面路径换成你的真实 checkpoint：
-
-```bash
-bash scripts/server_pipeline.sh bootstrap /root/autodl-tmp/models/qwen2_0.5b_sft_op10/checkpoint-10339
+bash scripts/server_pipeline.sh bootstrap-sft
 ```
 
 这一个命令会：
 
-1. 将 checkpoint 路径保存到本地 `.server.env`；该文件被 Git 忽略。
-2. 检查 Python 必须是 3.10、3.11 或 3.12。
-3. 创建 `.venv`。
-4. 安装 PyTorch 2.5.1 CUDA 12.1 和固定版本依赖。
-5. 校验正式数据、CUDA、BF16 和 checkpoint。
-6. 运行全部离线单元测试。
+1. 将模型和输出配置写入被 Git 忽略的 `.server.env`。
+2. 使用 Python 3.12 创建 `.venv`，安装固定版本依赖。
+3. 从 Hugging Face 下载公开的 `Qwen/Qwen2-0.5B`；它是预训练基础模型，不是随机初始化重训。
+4. 校验 SFT 输入只能是 1000 条 train/OP=10 正确解答，并检查 validation/test 无 prompt 或 DAG family 泄漏。
+5. 训练 2 epochs，只对 `Answer:` 后的答案 token 计算 loss，最终只保存一份完整 checkpoint。
+6. 校验正式 DPO 数据、CUDA、BF16 和新 checkpoint，再运行全部离线单元测试。
+
+基础模型与 pip 缓存都放在 `/root/autodl-tmp` 下的仓库 `.cache/`，避免占满系统盘；SFT checkpoint 位于：
+
+```text
+outputs/rebuttal_sft/qwen2_0.5b_op10/
+```
+
+预计首次依赖安装和模型下载约 10–30 分钟，SFT 约 5–20 分钟；网络速度是最大变量。重复运行时，若 `run_manifest.json` 已标记 `complete`，会直接复用而不会重训。
+
+目的：所有 DPO 条件从同一个、未接触 validation/test 和 rejected responses 的 SFT 起点开始，保证比较公平。
+
+## 第 5 步：一条命令启动整套实验
+
+如果希望输入最少，直接运行：
+
+```bash
+bash scripts/server_pipeline.sh start
+```
+
+它依次完成上一节的 SFT、8 样本真实 GPU smoke test，并用 `nohup` 在后台启动完整 DPO + validation。终端最后会返回 PID 和日志路径，之后可以安全断开 SSH。
+
+如果已有自己的同规模 SFT checkpoint，仍可使用：
+
+```bash
+bash scripts/server_pipeline.sh bootstrap /你的/checkpoint/路径 Qwen/Qwen2-0.5B
+```
 
 成功标志是预检输出包含：
 
@@ -107,16 +115,18 @@ bash scripts/server_pipeline.sh bootstrap /root/autodl-tmp/models/qwen2_0.5b_sft
 如果服务器默认 `python3` 不在 3.10--3.12 范围内，例如系统有 `python3.10`：
 
 ```bash
-PYTHON_BIN=python3.10 bash scripts/server_pipeline.sh bootstrap /你的/checkpoint/路径
+PYTHON_BIN=python3.10 bash scripts/server_pipeline.sh bootstrap-sft
 ```
 
 如果驱动明确支持 CUDA 12.4，并希望使用 cu124：
 
 ```bash
-TORCH_INDEX_URL=https://download.pytorch.org/whl/cu124 bash scripts/server_pipeline.sh bootstrap /你的/checkpoint/路径
+TORCH_INDEX_URL=https://download.pytorch.org/whl/cu124 bash scripts/server_pipeline.sh bootstrap-sft
 ```
 
 ## 第 6 步：运行真实 GPU 冒烟
+
+如果上一节已经用了 `start`，这一步已自动完成；下面命令用于单独运行或重新检查。
 
 ```bash
 bash scripts/server_pipeline.sh smoke
@@ -140,6 +150,8 @@ outputs/smoke_taxonomy/checkpoints/
 
 ## 第 7 步：后台启动完整训练与 validation
 
+如果已经用了 `start`，后台任务也已启动；不要紧接着重复执行。下面命令用于手动分步启动或中断后的矩阵级续跑。
+
 ```bash
 bash scripts/server_pipeline.sh launch-full
 ```
@@ -150,7 +162,7 @@ bash scripts/server_pipeline.sh launch-full
 2. 对每个完成模型运行 validation 八类型诊断。
 3. 自动生成跨 seed 汇总表。
 
-断开 SSH 不会终止 `nohup` 后台任务。A800 80GB 预计需要约 8–18 小时，实际时间取决于平均序列长度、磁盘速度和 GPU 当前负载。默认只保存每个模型的最终权重，不保存 step-200/400 中间副本；矩阵级断点续跑仍然有效。
+断开 SSH 不会终止 `nohup` 后台任务。A800 80GB 上，完整 30 模型 DPO + validation 预计约 8–18 小时；加上首次环境、下载和 SFT，整条流水线通常约 9–20 小时。实际时间取决于网络、平均序列长度、磁盘速度和 GPU 当前负载。默认只保存每个模型的最终权重，不保存 step-200/400 中间副本；矩阵级断点续跑仍然有效。
 
 ## 第 8 步：查看进度
 
@@ -216,13 +228,11 @@ bash scripts/server_pipeline.sh ident
 ## 最少命令清单
 
 ```bash
-cd /root
+cd /root/autodl-tmp
 git clone --branch codex/rebuttal-release --single-branch https://github.com/junqixu/What-Rejected-Responses-Teach.git
 cd What-Rejected-Responses-Teach
 bash scripts/server_pipeline.sh inspect
-bash scripts/server_pipeline.sh bootstrap /你的/checkpoint/路径
-bash scripts/server_pipeline.sh smoke
-bash scripts/server_pipeline.sh launch-full
+bash scripts/server_pipeline.sh start
 bash scripts/server_pipeline.sh status
 ```
 
@@ -240,7 +250,11 @@ bash scripts/server_pipeline.sh test
 
 ### `SFT checkpoint does not exist`
 
-路径写错或模型尚未上传。检查 `ls -lh /真实/路径`，然后重新执行 bootstrap。
+自动 SFT 尚未完成，或者配置中的路径错误。先看 `outputs/rebuttal_sft/qwen2_0.5b_op10/run_manifest.json` 和终端报错，再重新执行 `bootstrap-sft`；完整状态会复用，失败状态不会被误当成 checkpoint。
+
+### Hugging Face 下载失败
+
+先直接重试 `bootstrap-sft`；缓存支持续传。若服务器所在网络无法访问 Hugging Face，请配置你有权使用的模型源或在可访问机器下载 `Qwen/Qwen2-0.5B` 后把本地模型目录作为 `start` 的第一个参数。不要把访问 token 写进 Git。
 
 ### CUDA 不可用
 

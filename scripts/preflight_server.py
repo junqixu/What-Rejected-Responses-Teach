@@ -33,6 +33,34 @@ def _version(name: str) -> str | None:
         return None
 
 
+def check_checkpoint(path: Path) -> tuple[dict[str, Any], list[str]]:
+    blockers: list[str] = []
+    weights = sorted(path.glob("*.safetensors")) + sorted(path.glob("pytorch_model*.bin"))
+    required = (path / "config.json", path / "tokenizer_config.json")
+    if not path.is_dir():
+        return {"path": str(path), "exists": False}, [f"SFT checkpoint does not exist: {path}"]
+    for required_path in required:
+        if not required_path.exists():
+            blockers.append(f"SFT checkpoint is missing {required_path.name}: {path}")
+    if not weights:
+        blockers.append(f"SFT checkpoint has no model weights: {path}")
+    manifest_path = path / "run_manifest.json"
+    manifest_status = None
+    if manifest_path.exists():
+        try:
+            manifest_status = json.loads(manifest_path.read_text(encoding="utf-8")).get("status")
+        except (json.JSONDecodeError, OSError) as error:
+            blockers.append(f"cannot read SFT run manifest: {error}")
+        if manifest_status != "complete":
+            blockers.append(f"SFT run manifest status is not complete: {manifest_status!r}")
+    return {
+        "path": str(path),
+        "exists": True,
+        "weight_files": [item.name for item in weights],
+        "manifest_status": manifest_status,
+    }, blockers
+
+
 def check_data(data_root: Path) -> tuple[dict[str, Any], list[str]]:
     blockers: list[str] = []
     report: dict[str, Any] = {}
@@ -81,8 +109,10 @@ def main() -> None:
     if not args.data_only:
         if not args.checkpoint:
             blockers.append("SFT checkpoint is not set; pass --checkpoint or set SFT_CHECKPOINT")
-        elif not Path(args.checkpoint).exists():
-            blockers.append(f"SFT checkpoint does not exist: {args.checkpoint}")
+        else:
+            checkpoint_report, checkpoint_blockers = check_checkpoint(Path(args.checkpoint))
+            report["checkpoint"] = checkpoint_report
+            blockers.extend(checkpoint_blockers)
         try:
             import torch
         except ImportError:

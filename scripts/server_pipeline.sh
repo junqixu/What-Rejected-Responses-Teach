@@ -14,14 +14,20 @@ load_config() {
     set +a
   fi
   BASE_MODEL="${BASE_MODEL:-Qwen/Qwen2-0.5B}"
+  BASE_MODEL_REVISION="${BASE_MODEL_REVISION:-main}"
+  SFT_TRAIN_FILE="${SFT_TRAIN_FILE:-data/rebuttal_v2/source/train_clean.jsonl}"
+  SFT_OUTPUT="${SFT_OUTPUT:-outputs/rebuttal_sft/qwen2_0.5b_op10}"
   EXPERIMENT_SUITE="${EXPERIMENT_SUITE:-full}"
   SEEDS="${SEEDS:-414,6201,2026}"
   RUN_ROOT="${RUN_ROOT:-outputs/rebuttal_taxonomy_full}"
+  HF_HOME="${HF_HOME:-$REPO_ROOT/.cache/huggingface}"
+  PIP_CACHE_DIR="${PIP_CACHE_DIR:-$REPO_ROOT/.cache/pip}"
+  export HF_HOME PIP_CACHE_DIR
 }
 
 activate_environment() {
   if [[ ! -f "$VENV_DIR/bin/activate" ]]; then
-    echo "Missing $VENV_DIR. Run: bash scripts/server_pipeline.sh bootstrap /path/to/checkpoint" >&2
+    echo "Missing $VENV_DIR. Run bootstrap or bootstrap-sft first." >&2
     exit 2
   fi
   source "$VENV_DIR/bin/activate"
@@ -37,9 +43,13 @@ require_checkpoint() {
 save_config() {
   local checkpoint="$1"
   local model="$2"
+  local revision="${3:-main}"
   {
     printf 'SFT_CHECKPOINT=%q\n' "$checkpoint"
     printf 'BASE_MODEL=%q\n' "$model"
+    printf 'BASE_MODEL_REVISION=%q\n' "$revision"
+    printf 'SFT_TRAIN_FILE=%q\n' 'data/rebuttal_v2/source/train_clean.jsonl'
+    printf 'SFT_OUTPUT=%q\n' "$checkpoint"
     printf 'EXPERIMENT_SUITE=full\n'
     printf 'SEEDS=414,6201,2026\n'
     printf 'RUN_ROOT=outputs/rebuttal_taxonomy_full\n'
@@ -52,11 +62,14 @@ usage() {
 Usage:
   bash scripts/server_pipeline.sh inspect
   bash scripts/server_pipeline.sh bootstrap /path/to/sft_checkpoint [base_model]
+  bash scripts/server_pipeline.sh bootstrap-sft [base_model] [sft_output]
+  bash scripts/server_pipeline.sh start [base_model] [sft_output]
   bash scripts/server_pipeline.sh smoke
   bash scripts/server_pipeline.sh launch-full
   bash scripts/server_pipeline.sh status
   bash scripts/server_pipeline.sh test
 
+The start command prepares everything, trains SFT, runs smoke, and launches full in the background.
 The full command trains/resumes the matrix and evaluates validation only.
 The held-out test split is run separately with the test command.
 EOF
@@ -77,7 +90,7 @@ case "$mode" in
       echo "Provide an existing SFT checkpoint directory as argument 2." >&2
       exit 2
     fi
-    save_config "$checkpoint" "$model"
+    save_config "$checkpoint" "$model" "${BASE_MODEL_REVISION:-main}"
     load_config
     mkdir -p outputs/server_preflight
     python3 scripts/inspect_server.py --out outputs/server_preflight/environment_before_setup.json
@@ -86,6 +99,32 @@ case "$mode" in
     python scripts/preflight_server.py --checkpoint "$SFT_CHECKPOINT" --out outputs/server_preflight/preflight.json
     python -m unittest discover -s rebuttal/tests -v
     echo "Bootstrap complete. Next: bash scripts/server_pipeline.sh smoke"
+    ;;
+  bootstrap-sft)
+    model="${2:-$BASE_MODEL}"
+    checkpoint="${3:-$SFT_OUTPUT}"
+    revision="${BASE_MODEL_REVISION:-main}"
+    save_config "$checkpoint" "$model" "$revision"
+    load_config
+    mkdir -p outputs/server_preflight
+    python3 scripts/inspect_server.py --out outputs/server_preflight/environment_before_setup.json
+    bash scripts/setup_server.sh
+    activate_environment
+    python -m unittest discover -s rebuttal/tests -v
+    python -m rebuttal.train_sft \
+      --base_model "$BASE_MODEL" \
+      --model_revision "$BASE_MODEL_REVISION" \
+      --train_file "$SFT_TRAIN_FILE" \
+      --output_dir "$SFT_CHECKPOINT"
+    python scripts/preflight_server.py --checkpoint "$SFT_CHECKPOINT" --out outputs/server_preflight/preflight.json
+    echo "SFT bootstrap complete. Next: bash scripts/server_pipeline.sh smoke"
+    ;;
+  start)
+    model="${2:-$BASE_MODEL}"
+    checkpoint="${3:-$SFT_OUTPUT}"
+    bash scripts/server_pipeline.sh bootstrap-sft "$model" "$checkpoint"
+    bash scripts/server_pipeline.sh smoke
+    bash scripts/server_pipeline.sh launch-full
     ;;
   smoke)
     require_checkpoint
